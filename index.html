@@ -397,15 +397,19 @@
             font-family: monospace;
         }
 
-        @media (max-width: 1000px) {
-            .terminal-side { width: 10%; }
-            .main-content { width: 96%; padding: 1rem 0.8rem; }
-            .resume-card { padding: 1.2rem; }
-            .name-title h1 { font-size: 2rem; }
+        @media (max-width: 760px) {
+            .terminal-side {
+                display: block;
+                width: 12%;
+                opacity: 0.6;
+            }
+            .scrolling-codes {
+                animation-duration: 45s; /* آهسته‌تر برای کاهش مصرف CPU */
+            }
         }
 
         @media (max-width: 760px) {
-            .terminal-side { display: none; }
+            .terminal-side {width: 18%;}
             .agents-grid { gap: 1.2rem; }
         }
     </style>
