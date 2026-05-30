@@ -397,31 +397,53 @@
             font-family: monospace;
         }
 
+        /* ========= RESPONSIVE: فقط یک ستون کد در موبایل ========= */
         @media (max-width: 760px) {
-            .terminal-side {
+            /* مخفی کردن ستون راست */
+            .terminal-right {
+                display: none;
+            }
+            /* نمایش ستون چپ با عرض مناسب برای موبایل */
+            .terminal-left {
                 display: block;
-                width: 12%;
-                opacity: 0.6;
+                width: 18%;
+                opacity: 0.7;
             }
             .scrolling-codes {
                 animation-duration: 45s; /* آهسته‌تر برای کاهش مصرف CPU */
             }
+            .main-content {
+                width: 98%;
+                padding: 1rem 0.8rem;
+            }
+            .resume-card {
+                padding: 1.2rem;
+            }
+            .name-title h1 {
+                font-size: 2rem;
+            }
+            .agents-grid {
+                gap: 1.2rem;
+            }
         }
 
-        @media (max-width: 760px) {
-            .terminal-side {width: 18%;}
-            .agents-grid { gap: 1.2rem; }
+        /* برای صفحه‌نمایش‌های بسیار کوچک (عرض کمتر از 480px) عرض ستون را کمی کمتر کنیم */
+        @media (max-width: 480px) {
+            .terminal-left {
+                width: 12%;
+                opacity: 0.6;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- LEFT TERMINAL: colorful VS Code animated code -->
+<!-- LEFT TERMINAL: colorful VS Code animated code (در موبایل تنها همین ستون نمایش داده می‌شود) -->
 <div class="terminal-side terminal-left">
     <div class="scrolling-codes" id="leftColorfulCode"></div>
 </div>
 
-<!-- RIGHT TERMINAL -->
+<!-- RIGHT TERMINAL: در موبایل مخفی می‌شود -->
 <div class="terminal-side terminal-right">
     <div class="scrolling-codes" id="rightColorfulCode"></div>
 </div>
@@ -435,8 +457,6 @@
                 <span><i class="fas fa-phone-alt"></i> 09182379082</span>
                 <span><i class="fas fa-envelope"></i> a.m.parviz02@gmail.com</span>
                 <span><i class="fas fa-map-marker-alt"></i> Iran</span>
-                <a href="https://www.linkedin.com/in/amir-mehdi-parviz/" target="_blank" class="linkedin-btn"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                <a href="https://github.com/GIGAParviz" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub Profile</a>
             </div>
         </div>
 
@@ -455,7 +475,7 @@
         <div>
             <div class="section-title"><i class="fas fa-briefcase"></i> Experience</div>
             <div class="exp-item">
-                <div class="exp-header"><span>AI Developer & Data Analysis</span> <span class="exp-date">Caitech | Iran · Jun 2022 – 2024</span></div>
+                <div class="exp-header"><span>AI Developer & Data Analysis</span> <span class="exp-date">Caitech | Iran · Jun 2020 – Present</span></div>
                 <ul class="exp-desc">
                     <li><i class="fas fa-chevron-right"></i> AI-based software & applications across industries</li>
                     <li><i class="fas fa-chevron-right"></i> Built intelligent chatbot with web search, document processing, context-awareness</li>
@@ -484,15 +504,18 @@
                 <a href="https://github.com/GIGAParviz/Template_Matching" target="_blank"><i class="fab fa-github"></i> Template Matching</a>
             </div>
             <div style="margin-top: 1rem;">
+                <a href="https://www.linkedin.com/in/amir-mehdi-parviz/" target="_blank" class="linkedin-btn"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                <a href="https://github.com/GIGAParviz" target="_blank" class="github-btn"><i class="fab fa-github"></i> GitHub Profile</a>
             </div>
         </div>
     </div>
 
     <!-- AGENTS: each shows image/video preview instead of code -->
     <div class="agents-section">
-        <div class="section-title"><i class="fas fa-robot"></i> Projects - Click to watch</div>
+        <div class="section-title"><i class="fas fa-robot"></i> AI Agents · کلیک کنید برای مشاهده نمونه کار (ویدئو/تصویر)</div>
         <div class="agents-grid" id="agentsGrid"></div>
     </div>
+    <footer>BlackBox Terminal · VS Code Theme · Preview واقعی پروژه‌ها</footer>
 </div>
 
 <!-- MODAL for preview -->
@@ -566,19 +589,19 @@
     const projectsData = [
         {
             title: "Parviz Mind IDE",
-            mediaPath: "./exmaple_ide.png",
+            mediaPath: "C:/Users/ASUS/OneDrive/Desktop/tts/exmaple_ide.png",
             type: "image",
             description: "Neural IDE with BCI & AGI integration"
         },
         {
             title: "Speed & Distance Estimator",
-            mediaPath: "./Speed-and-Distance-Estimator.mp4",
+            mediaPath: "C:/Users/ASUS/OneDrive/Desktop/tts/Speed-and-Distance-Estimator.mp4",
             type: "video",
             description: "ADAS realtime distance estimation"
         },
         {
             title: "Traffic Control System",
-            mediaPath: "./traffic.mp4",
+            mediaPath: "C:/Users/ASUS/OneDrive/Desktop/tts/traffic.mp4",
             type: "video",
             description: "RL-based traffic light optimization + violation detection"
         }
@@ -700,4 +723,3 @@
 </script>
 </body>
 </html>
-
