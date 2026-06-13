@@ -4,25 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Amir Mehdi Parviz · AI Developer · Fewer Twinkling Stars</title>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Fira+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --space-1: #04050a;
-  --space-2: #070b14;
-  --space-3: #0b1220;
-  --accent: #6effc2;
-  --accent2: #a397ff;
-  --accent3: #ff8bb6;
-  --text: #ffffff;
+  --space-1: #1e1e1e;
+  --space-2: #1a1a1a;
+  --space-3: #151515;
+  --space-card: rgba(50, 50, 50, 0.6);
+  --accent: #d97706;
+  --accent2: #9333ea;
+  --accent3: #dc2626;
+  --text: #e5e5e5;
   --text-bright: #ffffff;
-  --text-muted: #e0eaff;
-  --text-dim: #b0c4f0;
-  --prompt: #6effc2;
+  --text-muted: #c0c0c0;
+  --text-dim: #909090;
+  --prompt: #d97706;
   --mono: 'Fira Code', 'Fira Mono', monospace;
   --body: 'Space Grotesk', sans-serif;
+  --glass-border: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(30, 30, 30, 0.55);
+  --section-gap: clamp(2rem, 5vw, 4rem);
+  --content-max: 900px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  #particleCanvas, #milkywayCanvas { display: none; }
 }
 
 html { scroll-behavior: smooth; }
@@ -32,51 +52,116 @@ body {
   font-family: var(--body);
   color: var(--text);
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   cursor: default;
-  position: relative;
-  font-size: 1.05rem;
-  line-height: 1.5;
+  font-size: clamp(1rem, 1.5vw, 1.05rem);
+  line-height: 1.6;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+.skip-link {
+  position: fixed; top: -100%; left: 1rem; z-index: 9999;
+  background: var(--accent); color: #fff;
+  padding: 0.5rem 1rem; border-radius: var(--radius-sm);
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+
+.scroll-progress {
+  position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  z-index: 10001; transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: rgba(30, 30, 30, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+nav.visible { transform: translateY(0); }
+.nav-logo {
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
+  color: var(--accent); text-decoration: none;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.nav-links { display: flex; gap: 0.25rem; }
+.nav-links a {
+  font-family: var(--mono); font-size: 0.75rem;
+  color: var(--text-dim); text-decoration: none;
+  padding: 0.4rem 0.7rem; border-radius: var(--radius-sm);
+  transition: color 0.2s, background 0.2s;
+  min-height: 44px; display: flex; align-items: center;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--accent); background: rgba(217, 119, 6, 0.1); }
+.nav-hamburger {
+  display: none; background: none; border: none; cursor: pointer;
+  width: 44px; height: 44px; align-items: center; justify-content: center;
+}
+.nav-hamburger span { display: block; width: 20px; height: 2px; background: var(--accent); margin: 4px 0; transition: 0.3s; }
+
+@media (max-width: 768px) {
+  nav { padding: 0 1rem; }
+  .nav-links {
+    position: fixed; top: 56px; left: 0; right: 0;
+    background: rgba(30, 30, 30, 0.97); backdrop-filter: blur(20px);
+    flex-direction: column; padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transform: translateY(-100%); opacity: 0; pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav-links.open { transform: translateY(0); opacity: 1; pointer-events: all; }
+  .nav-links a { padding: 0.75rem 1rem; min-height: 44px; }
+  .nav-hamburger { display: flex; }
 }
 
 #particleCanvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  will-change: contents; opacity: 0.3;
 }
 
 #milkywayCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.65;
-  transition: opacity 0.3s;
+  position: fixed; top: 0; left: 0;
+  width: 240px; height: 100%;
+  z-index: 2; pointer-events: none;
+  opacity: 0.7; will-change: contents;
 }
 
 @media (max-width: 768px) {
-  #milkywayCanvas { width: 180px; opacity: 0.45; }
+  #milkywayCanvas { width: 140px; opacity: 0.5; }
+}
+@media (max-width: 480px) {
+  #milkywayCanvas { display: none; }
 }
 
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  opacity: 0.38;
+  pointer-events: none; opacity: 0;
 }
 
 .wrap {
   position: relative; z-index: 10;
-  max-width: 900px;
-  width: 94%;
+  max-width: var(--content-max);
+  width: 92%;
   margin: 0 auto;
-  padding: 2.5rem 0 5rem;
+  padding: 6rem 0 5rem;
 }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
 
 .prompt-line {
   font-family: var(--mono);
@@ -86,25 +171,20 @@ body::before {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: transparent;
-  border: none;
 }
 .prompt-line .ps { color: var(--prompt); }
-.prompt-line .cmd { color: #cbddf5; }
+.prompt-line .cmd { color: #d4d4d4; }
 .prompt-line .cursor {
   width: 7px; height: 16px;
   background: var(--accent);
   display: inline-block;
   animation: blink 1.1s step-end infinite;
-  margin-left: 2px;
-  border-radius: 1px;
+  margin-left: 2px; border-radius: 1px;
 }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .hero {
-  background: transparent;
-  border: none;
-  padding: 1.2rem 0 1rem 0;
+  padding: 1.2rem 0 1rem;
   margin-bottom: 0.5rem;
 }
 .hero-tag {
@@ -114,58 +194,61 @@ body::before {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  display: flex; align-items: center; gap: 0.6rem;
 }
 .hero-tag::before { content: '//'; color: var(--text-dim); }
 .hero-name {
   font-family: var(--mono);
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.2rem, 6vw, 4rem);
   font-weight: 700;
   color: var(--text-bright);
   letter-spacing: -0.02em;
-  line-height: 1.08;
+  line-height: 1.1;
   margin-bottom: 1rem;
 }
-.hero-name .last { color: var(--accent); text-shadow: 0 0 18px rgba(110,255,194,0.2); }
+.hero-name .last {
+  color: var(--accent);
+  text-shadow: none;
+}
 .hero-sub {
   font-family: var(--mono);
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
   color: var(--text-muted);
   margin-bottom: 1.8rem;
-  line-height: 1.7;
+  line-height: 1.8;
 }
-.hero-sub .kw, .hero-sub .str, .hero-sub .fn { color: var(--accent2); }
+.hero-sub .kw, .hero-sub .str { color: var(--accent2); }
+.hero-sub .fn { color: var(--accent2); }
+
 .hero-divider {
   height: 1px;
-  background: linear-gradient(90deg, var(--accent) 0%, rgba(163,151,255,0.5) 60%, transparent 100%);
-  margin: 1.2rem 0;
-  opacity: 0.4;
+  background: linear-gradient(90deg, var(--accent) 0%, rgba(147, 51, 234, 0.5) 60%, transparent 100%);
+  margin: 1.2rem 0; opacity: 0.4;
 }
+
 .contacts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.85rem;
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
 }
 .contact-item {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--mono);
   font-size: 0.8rem;
-  color: var(--text-muted);
-  background: transparent;
-  border: none;
-  padding: 0.2rem 0;
-  border-bottom: 1px dotted transparent;
+  color: var(--text-bright);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.8rem;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  cursor: default;
 }
-.contact-item i { color: var(--accent); font-size: 0.8rem; width: 1.2rem; }
-.contact-item:hover { color: var(--text-bright); border-bottom-color: var(--accent); }
+a.contact-item { cursor: pointer; }
+.contact-item i { color: var(--accent); font-size: 0.8rem; width: 1.2rem; text-align: center; }
+.contact-item:hover { color: var(--text-bright); border-color: rgba(217, 119, 6, 0.5); background: rgba(217, 119, 6, 0.08); }
 
 .block {
-  background: transparent;
-  padding: 1.5rem 0 0.8rem 0;
+  padding: var(--section-gap) 0 0.8rem;
   margin-bottom: 0.5rem;
 }
 .sec-head {
@@ -178,27 +261,29 @@ body::before {
   color: var(--accent);
   margin-bottom: 1.2rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(110,255,194,0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-.skills-wrap { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .sk {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--mono);
   font-size: 0.8rem;
-  color: var(--text-muted);
-  background: transparent;
-  border: none;
-  padding: 0.2rem 0;
-  border-bottom: 1px dashed rgba(110,255,194,0);
-  transition: color 0.15s;
+  color: var(--text-bright);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  transition: all 0.2s ease;
+  cursor: default;
 }
-.sk i { color: var(--accent2); font-size: 0.8rem; width: 1.2rem; }
-.sk:hover { color: var(--accent); border-bottom-color: rgba(110,255,194,0.4); }
+.sk i { color: var(--accent2); font-size: 0.8rem; width: 1.2rem; text-align: center; }
+.sk:hover { color: var(--accent); border-color: rgba(217, 119, 6, 0.4); background: rgba(217, 119, 6, 0.08); }
 
 .exp-block {
   padding-bottom: 1.2rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .exp-block:last-child { border-bottom: none; }
 .exp-top {
@@ -208,8 +293,7 @@ body::before {
 }
 .exp-role {
   font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1rem; font-weight: 600;
   color: var(--text-bright);
 }
 .exp-co {
@@ -222,23 +306,18 @@ body::before {
   font-family: var(--mono);
   font-size: 0.75rem;
   color: var(--text-dim);
-  background: transparent;
-  padding: 0;
 }
 .exp-list { list-style: none; }
 .exp-list li {
   display: flex; gap: 0.8rem;
   font-size: 0.95rem;
-  color: #ffffff;
-  line-height: 1.65;
+  color: var(--text-bright);
+  line-height: 1.7;
   margin-bottom: 0.6rem;
 }
 .exp-list li::before {
-  content: '›';
-  color: var(--accent);
-  font-family: var(--mono);
-  flex-shrink: 0;
-  font-size: 1.1rem;
+  content: '›'; color: var(--accent);
+  font-family: var(--mono); flex-shrink: 0; font-size: 1.1rem;
 }
 
 .edu-row {
@@ -247,71 +326,74 @@ body::before {
 }
 .edu-deg {
   font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1rem; font-weight: 600;
   color: var(--text-bright);
 }
-.edu-uni {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-}
-.repos-wrap { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+.edu-uni { font-size: 0.9rem; color: var(--text-bright); margin-top: 0.2rem; }
+
+.repos-wrap { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .repo-btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--mono);
   font-size: 0.8rem;
-  color: var(--text-muted);
-  background: transparent;
-  border: none;
-  padding: 0.2rem 0;
-  border-bottom: 1px solid rgba(163,151,255,0.2);
+  color: var(--text-bright);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  min-height: 44px;
 }
 .repo-btn i { color: var(--accent2); font-size: 0.8rem; }
-.repo-btn:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.repo-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(217, 119, 6, 0.08); }
+
 .proj-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   gap: 1rem;
 }
 .proj-card {
-  border: 1px solid rgba(110,255,194,0.12);
-  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
-  background: rgba(6, 12, 22, 0.55);
-  backdrop-filter: blur(2px);
-  transition: border-color 0.22s, transform 0.18s;
+  background: var(--glass-bg);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.22s, transform 0.18s, box-shadow 0.22s;
 }
 .proj-card:hover {
-  border-color: rgba(110,255,194,0.5);
-  transform: translateY(-2px);
+  border-color: rgba(217, 119, 6, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
+.proj-card:active { transform: translateY(0); }
 .proj-thumb {
   aspect-ratio: 16/9;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
 }
-.proj-thumb img, .proj-thumb video { width:100%; height:100%; object-fit:cover; }
+.proj-thumb img, .proj-thumb video { width: 100%; height: 100%; object-fit: cover; }
 .proj-label {
   padding: 0.7rem 0.9rem;
   font-family: var(--mono);
   font-size: 0.8rem;
-  color: #ffffff;
+  color: var(--text-bright);
   display: flex; align-items: center; gap: 0.5rem;
 }
 .proj-label i { color: var(--accent); }
+
 .pub-journal {
   font-family: var(--mono);
   font-size: 0.75rem;
   color: var(--accent3);
   margin-bottom: 0.8rem;
   display: flex; align-items: center; gap: 0.5rem;
+  flex-wrap: wrap;
 }
 .pub-title {
-  font-size: 1.15rem;
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
   font-weight: 600;
   color: var(--text-bright);
   line-height: 1.45;
@@ -320,7 +402,7 @@ body::before {
 .pub-authors {
   font-family: var(--mono);
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--text-bright);
   margin-bottom: 0.8rem;
 }
 .pub-authors strong { color: var(--accent); }
@@ -337,27 +419,30 @@ body::before {
   gap: 0.7rem;
   margin-bottom: 1rem;
 }
-@media(max-width:580px){ .pub-highlights { grid-template-columns: 1fr; } }
+@media (max-width: 580px) { .pub-highlights { grid-template-columns: 1fr; } }
 .pub-hl {
   display: flex; gap: 0.6rem;
   font-size: 0.9rem;
-  color: #ffffff;
-  background: transparent;
-  padding: 0.2rem 0;
+  color: var(--text-bright);
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
   align-items: flex-start;
 }
 .pub-hl::before {
-  content: '✦';
-  color: var(--accent);
-  font-size: 0.8rem;
-  flex-shrink: 0;
+  content: '✦'; color: var(--accent);
+  font-size: 0.8rem; flex-shrink: 0;
+  margin-top: 0.15rem;
 }
 .pub-abstract {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--text-bright);
   line-height: 1.7;
-  padding: 0 0 0 0.9rem;
-  border-left: 2px solid rgba(110,255,194,0.3);
+  padding: 0.8rem 1rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 1rem;
 }
 .pub-link {
@@ -367,496 +452,739 @@ body::before {
   border-bottom: 1px solid var(--accent);
   text-decoration: none;
   padding: 0.2rem 0;
+  transition: border-color 0.2s;
 }
 .pub-link:hover { border-bottom-color: var(--accent2); }
 
 .overlay {
-  display: none; position: fixed; inset:0;
-  background: rgba(2,4,10,0.94);
+  display: none; position: fixed; inset: 0;
+  background: rgba(10, 10, 10, 0.9);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   z-index: 2000;
   justify-content: center; align-items: center;
+  opacity: 0; transition: opacity 0.3s ease;
 }
-.overlay.show { display: flex; }
+.overlay.show { display: flex; opacity: 1; }
 .modal-box {
-  background: rgba(10, 16, 28, 0.98);
-  border: 1px solid rgba(110,255,194,0.25);
-  border-radius: 18px;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   width: 92%; max-width: 880px;
+  transform: scale(0.95); transition: transform 0.3s ease;
 }
+.overlay.show .modal-box { transform: scale(1); }
 .modal-head {
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: center;
   padding: 0.9rem 1.4rem;
-  border-bottom: 1px solid rgba(110,255,194,0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+.modal-head h3 { font-family: var(--mono); font-size: 0.9rem; color: var(--text-bright); }
 .modal-close {
   background: none; border: none;
-  color: var(--text-muted); font-size: 1.6rem;
-  cursor: pointer;
+  color: var(--text-bright); font-size: 1.6rem;
+  cursor: pointer; min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s;
 }
+.modal-close:hover { color: var(--accent); }
 .modal-body { padding: 1.4rem; text-align: center; }
-.modal-body img, .modal-body video { max-width:100%; max-height:72vh; border-radius:12px; }
+.modal-body img, .modal-body video { max-width: 100%; max-height: 72vh; border-radius: var(--radius-md); }
 
 .chat-box {
-  background: rgba(6,10,20,0.98);
-  border: 1px solid rgba(110,255,194,0.25);
-  border-radius: 20px;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   width: 92%; max-width: 500px;
+  max-height: 85vh;
 }
 .chat-head {
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: center;
   padding: 0.9rem 1.4rem;
-  border-bottom: 1px solid rgba(110,255,194,0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 .chat-status {
   font-family: var(--mono); font-size: 0.75rem; color: var(--accent);
   display: flex; align-items: center; gap: 0.5rem;
 }
 .chat-status::before {
-  content: ''; width:6px; height:6px;
-  border-radius:50%; background: var(--accent);
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent);
   animation: pulse 1.8s infinite;
 }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .chat-msgs {
   height: 280px; overflow-y: auto; padding: 1rem;
   display: flex; flex-direction: column; gap: 0.7rem;
+  scroll-behavior: smooth;
 }
 .msg {
   max-width: 84%; padding: 0.6rem 1rem;
-  border-radius: 14px; font-size: 0.9rem; line-height: 1.5;
+  border-radius: var(--radius-md); font-size: 0.9rem; line-height: 1.5;
 }
 .ai-msg {
   align-self: flex-start;
-  background: rgba(110,255,194,0.07);
-  border: 1px solid rgba(110,255,194,0.18);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 2px solid var(--accent);
-  color: #ffffff;
+  color: var(--text-bright);
 }
 .user-msg {
   align-self: flex-end;
-  background: rgba(163,151,255,0.12);
-  border: 1px solid rgba(163,151,255,0.25);
-  color: #ffffff;
+  background: rgba(147, 51, 234, 0.15);
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  color: var(--text-bright);
 }
 .typing { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); padding: 0.4rem 0.8rem; }
 .chat-input {
   display: flex; gap: 0.5rem; padding: 0.8rem 1rem;
-  border-top: 1px solid rgba(110,255,194,0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .chat-input input {
-  flex:1; background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 9px; padding: 0.55rem 0.9rem;
-  color: #ffffff;
+  flex: 1; background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm); padding: 0.6rem 0.9rem;
+  color: var(--text-bright);
   font-family: var(--mono); font-size: 0.85rem;
-  outline: none;
+  outline: none; min-height: 44px;
+  transition: border-color 0.2s;
 }
 .chat-input input:focus { border-color: var(--accent); }
 .chat-send {
   background: var(--accent); border: none;
-  border-radius: 8px; padding: 0 1rem;
-  color: #040810; font-family: var(--mono);
+  border-radius: var(--radius-sm); padding: 0 1.2rem;
+  color: #fff; font-family: var(--mono);
   font-size: 0.8rem; font-weight: 700;
-  cursor: pointer;
+  cursor: pointer; min-height: 44px;
+  transition: opacity 0.2s;
 }
 .chat-send:hover { opacity: 0.85; }
+.chat-send:active { opacity: 0.7; }
+
 .buddy {
-  position: fixed; right: 24px;
-  z-index: 1000; cursor: pointer;
-  transition: top 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
+  position: fixed; right: 24px; z-index: 1000;
+  cursor: pointer;
+  transition: top 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 .buddy-inner {
   display: flex; flex-direction: column; align-items: center;
-  background: rgba(4,6,14,0.85);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(110,255,194,0.35);
-  border-radius: 14px; padding: 7px 9px 5px;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 7px 9px 5px;
   animation: float 3.5s ease-in-out infinite;
 }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 canvas { image-rendering: crisp-edges; }
 .buddy-label { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); margin-top: 3px; }
 .buddy-hint { font-family: var(--mono); font-size: 0.55rem; color: var(--text-dim); }
+
 footer {
   text-align: center; margin-top: 3.5rem;
   font-family: var(--mono); font-size: 0.7rem;
   color: var(--text-dim);
+  padding-bottom: 2rem;
 }
 footer span { color: var(--accent); }
-@media(max-width:600px){
+
+@media (max-width: 768px) {
+  .wrap { padding: 5rem 0 3rem; width: 94%; }
   .hero { padding: 1rem 0 0.5rem; }
-  .block { padding: 1rem 0 0.5rem; }
-  .hero-name { font-size: 2.2rem; }
+  .block { padding: var(--section-gap) 0 0.5rem; }
+  .hero-name { font-size: 2rem; }
   .buddy { right: 10px; }
+  .contacts { gap: 0.4rem; }
+  .contact-item { font-size: 0.75rem; padding: 0.35rem 0.6rem; }
+}
+@media (max-width: 480px) {
+  .hero-name { font-size: 1.75rem; }
+  .prompt-line { font-size: 0.75rem; }
+  .buddy { display: none; }
 }
 </style>
 </head>
 <body>
 
-<canvas id="particleCanvas"></canvas>
-<canvas id="milkywayCanvas"></canvas>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scrollProgress"></div>
 
-<div class="wrap">
-  <div class="prompt-line">
+<nav id="mainNav" aria-label="Main navigation">
+  <a href="#" class="nav-logo" aria-label="Home">
+    <i class="fas fa-terminal"></i> parviz
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#skills-section">Skills</a>
+    <a href="#experience-section">Experience</a>
+    <a href="#projects-section">Projects</a>
+    <a href="#publications-section">Publications</a>
+  </div>
+  <button class="nav-hamburger" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<canvas id="particleCanvas" aria-hidden="true"></canvas>
+<canvas id="milkywayCanvas" aria-hidden="true"></canvas>
+
+<main id="main-content" class="wrap">
+  <div class="prompt-line reveal">
     <span class="ps">parviz@portfolio:~$</span>
     <span class="cmd">./load_resume.sh --mode=interactive</span>
     <span class="cursor"></span>
   </div>
-  <div class="hero">
+  <section class="hero reveal reveal-delay-1" aria-label="Introduction">
     <div class="hero-tag">AI Developer &amp; Researcher</div>
-    <div class="hero-name"><span class="first">Amir Mehdi </span><span class="last">Parviz</span></div>
+    <h1 class="hero-name"><span class="first">Amir Mehdi </span><span class="last">Parviz</span></h1>
     <div class="hero-sub"><span class="kw">"Deep Learning"</span> · <span class="str">"LLM"</span> · <span class="str">"Computer Vision"</span><br><span class="fn">AI · Research · Engineering</span></div>
     <div class="hero-divider"></div>
-    <div class="contacts">
-      <span class="contact-item"><i class="fas fa-phone-alt"></i>+98 918 237 9082</span>
-      <span class="contact-item"><i class="fas fa-envelope"></i>a.m.parviz02@gmail.com</span>
-      <span class="contact-item"><i class="fas fa-map-marker-alt"></i>Iran</span>
-      <a href="https://www.linkedin.com/in/amir-mehdi-parviz/" target="_blank" class="contact-item"><i class="fab fa-linkedin"></i>LinkedIn</a>
-      <a href="https://github.com/GIGAParviz" target="_blank" class="contact-item"><i class="fab fa-github"></i>GitHub</a>
-      <a href="https://huggingface.co/GIGAParviz" target="_blank" class="contact-item"><i class="fas fa-huggingface"></i>Hugging Face</a>
+    <div class="contacts" role="list">
+      <span class="contact-item" role="listitem"><i class="fas fa-phone-alt" aria-hidden="true"></i>+98 918 237 9082</span>
+      <span class="contact-item" role="listitem"><i class="fas fa-envelope" aria-hidden="true"></i>a.m.parviz02@gmail.com</span>
+      <span class="contact-item" role="listitem"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Iran</span>
+      <a href="https://www.linkedin.com/in/amir-mehdi-parviz/" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i>LinkedIn</a>
+      <a href="https://github.com/GIGAParviz" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="GitHub profile"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>
+      <a href="https://huggingface.co/GIGAParviz" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="Hugging Face profile"><i class="fas fa-hugging-face" aria-hidden="true"></i>Hugging Face</a>
     </div>
-  </div>
-  <div class="block"><div class="sec-head"><i class="fas fa-microchip"></i> Core Competencies</div><div class="skills-wrap"><span class="sk"><i class="fab fa-python"></i>Python</span><span class="sk"><i class="fas fa-brain"></i>Deep Learning · TF / PyTorch</span><span class="sk"><i class="fas fa-language"></i>LLM / NLP</span><span class="sk"><i class="fas fa-eye"></i>Computer Vision · YOLO</span><span class="sk"><i class="fas fa-chart-line"></i>Model Optimization</span><span class="sk"><i class="fas fa-wave-square"></i>EEG Signal Processing</span><span class="sk"><i class="fas fa-chart-bar"></i>Time-Series Analysis</span><span class="sk"><i class="fas fa-database"></i>Docker · Git · SQL</span></div></div>
-  <div class="block"><div class="sec-head"><i class="fas fa-briefcase"></i> Experience</div><div class="exp-block"><div class="exp-top"><div><div class="exp-role">AI Developer &amp; Data Analyst</div><div class="exp-co">Caitech</div></div><div class="exp-date">2022 – 2024</div></div><ul class="exp-list"><li>Built intelligent chatbots with web search &amp; document processing</li><li>Computer vision pipeline for autonomous vehicles — object detection &amp; lane tracking</li><li>EEG signal analysis system for ADHD diagnosis support</li></ul></div></div>
-  <div class="block"><div class="sec-head"><i class="fas fa-graduation-cap"></i> Education</div><div class="edu-row"><div><div class="edu-deg">Bachelor of Chemical Engineering</div><div class="edu-uni">Kermanshah University of Technology, Iran</div></div><div class="exp-date">2022 – Present</div></div></div>
-  <div class="block" id="repos-section"><div class="sec-head"><i class="fab fa-github"></i> Repositories</div><div class="repos-wrap"><a href="https://github.com/GIGAParviz/Parviz_Mind" target="_blank" class="repo-btn"><i class="fab fa-github"></i>Parviz_Mind</a><a href="https://github.com/GIGAParviz/Speed-and-Distance-Estimator" target="_blank" class="repo-btn"><i class="fab fa-github"></i>Speed-Distance-Estimator</a><a href="https://github.com/GIGAParviz/Traffic-Control" target="_blank" class="repo-btn"><i class="fab fa-github"></i>Traffic-Control</a><a href="https://github.com/GIGAParviz/Template_Matching" target="_blank" class="repo-btn"><i class="fab fa-github"></i>Template_Matching</a></div></div>
-  <div class="block"><div class="sec-head" id="projects-title"><i class="fas fa-robot"></i> Projects</div><div class="proj-grid" id="projGrid"></div></div>
-  <div class="block"><div class="sec-head"><i class="fas fa-book-open"></i> Publications</div><div class="pub-journal"><i class="fas fa-flask"></i>Chemical Engineering Journal Advances · Vol. 26 · May 2026 · 101132</div><div class="pub-title">Enhanced absorption performance of triethanolamine — bio-derived amino acid systems: Integrating experimental design and machine learning prediction</div><div class="pub-authors">Bita Valadian, Peyvand Valeh-e-Sheyda, <strong>Amir Mehdi Parviz</strong></div><div class="pub-meta-row"><span><i class="fas fa-external-link-alt"></i>DOI: 10.1016/j.ceja.2026.101132</span><span><i class="fas fa-lock-open"></i>Open Access</span></div><div class="pub-highlights"><div class="pub-hl">Novel TEA-arginine green solvent for enhanced CO₂ capture</div><div class="pub-hl">Threefold enhancement over MDEA benchmark (306 vs. 107 kmol/h·m³)</div><div class="pub-hl">Gas flow rate as dominant parameter — 61.7% contribution</div><div class="pub-hl">Random Forest model accuracy R² > 0.988</div></div><div class="pub-abstract">This study introduces a hybrid solvent combining TEA with bio-derived l-arginine within a microfluidic contactor. The TEA-Arg system achieved 306 kmol/h·m³ volumetric molar flux (73% capture efficiency) — a threefold enhancement over MDEA. Random Forest models accurately predicted key mass transfer parameters (R² > 0.988), enabling optimized CO₂ capture process design.</div><a href="https://www.sciencedirect.com/science/article/pii/S2666821126001018" target="_blank" class="pub-link"><i class="fas fa-external-link-alt"></i>Read on ScienceDirect</a></div>
+  </section>
+
+  <section class="block reveal" id="skills-section" aria-label="Core Competencies">
+    <div class="sec-head"><i class="fas fa-microchip" aria-hidden="true"></i> Core Competencies</div>
+    <div class="skills-wrap">
+      <span class="sk"><i class="fab fa-python" aria-hidden="true"></i>Python</span>
+      <span class="sk"><i class="fas fa-brain" aria-hidden="true"></i>Deep Learning · TF / PyTorch</span>
+      <span class="sk"><i class="fas fa-language" aria-hidden="true"></i>LLM / NLP</span>
+      <span class="sk"><i class="fas fa-eye" aria-hidden="true"></i>Computer Vision · YOLO</span>
+      <span class="sk"><i class="fas fa-chart-line" aria-hidden="true"></i>Model Optimization</span>
+      <span class="sk"><i class="fas fa-wave-square" aria-hidden="true"></i>EEG Signal Processing</span>
+      <span class="sk"><i class="fas fa-chart-bar" aria-hidden="true"></i>Time-Series Analysis</span>
+      <span class="sk"><i class="fas fa-database" aria-hidden="true"></i>Docker · Git · SQL</span>
+    </div>
+  </section>
+
+  <section class="block reveal" id="experience-section" aria-label="Experience">
+    <div class="sec-head"><i class="fas fa-briefcase" aria-hidden="true"></i> Experience</div>
+    <div class="exp-block">
+      <div class="exp-top">
+        <div>
+          <div class="exp-role">AI Developer &amp; Data Analyst</div>
+          <div class="exp-co">Caitech</div>
+        </div>
+        <div class="exp-date">2022 – 2024</div>
+      </div>
+      <ul class="exp-list">
+        <li>Built intelligent chatbots with web search &amp; document processing</li>
+        <li>Computer vision pipeline for autonomous vehicles — object detection &amp; lane tracking</li>
+        <li>EEG signal analysis system for ADHD diagnosis support</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block reveal" id="education-section" aria-label="Education">
+    <div class="sec-head"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Education</div>
+    <div class="edu-row">
+      <div>
+        <div class="edu-deg">Bachelor of Chemical Engineering</div>
+        <div class="edu-uni">Kermanshah University of Technology, Iran</div>
+      </div>
+      <div class="exp-date">2022 – Present</div>
+    </div>
+  </section>
+
+  <section class="block reveal" id="repos-section" aria-label="Repositories">
+    <div class="sec-head"><i class="fab fa-github" aria-hidden="true"></i> Repositories</div>
+    <div class="repos-wrap">
+      <a href="https://github.com/GIGAParviz/Parviz_Mind" target="_blank" rel="noopener" class="repo-btn" aria-label="Parviz_Mind repository"><i class="fab fa-github" aria-hidden="true"></i>Parviz_Mind</a>
+      <a href="https://github.com/GIGAParviz/Speed-and-Distance-Estimator" target="_blank" rel="noopener" class="repo-btn" aria-label="Speed and Distance Estimator repository"><i class="fab fa-github" aria-hidden="true"></i>Speed-Distance-Estimator</a>
+      <a href="https://github.com/GIGAParviz/Traffic-Control" target="_blank" rel="noopener" class="repo-btn" aria-label="Traffic Control repository"><i class="fab fa-github" aria-hidden="true"></i>Traffic-Control</a>
+      <a href="https://github.com/GIGAParviz/Template_Matching" target="_blank" rel="noopener" class="repo-btn" aria-label="Template Matching repository"><i class="fab fa-github" aria-hidden="true"></i>Template_Matching</a>
+    </div>
+  </section>
+
+  <section class="block reveal" id="projects-section" aria-label="Projects">
+    <div class="sec-head" id="projects-title"><i class="fas fa-robot" aria-hidden="true"></i> Projects</div>
+    <div class="proj-grid" id="projGrid"></div>
+  </section>
+
+  <section class="block reveal" id="publications-section" aria-label="Publications">
+    <div class="sec-head"><i class="fas fa-book-open" aria-hidden="true"></i> Publications</div>
+    <div class="pub-journal"><i class="fas fa-flask" aria-hidden="true"></i>Chemical Engineering Journal Advances · Vol. 26 · May 2026 · 101132</div>
+    <h2 class="pub-title">Enhanced absorption performance of triethanolamine — bio-derived amino acid systems: Integrating experimental design and machine learning prediction</h2>
+    <div class="pub-authors">Bita Valadian, Peyvand Valeh-e-Sheyda, <strong>Amir Mehdi Parviz</strong></div>
+    <div class="pub-meta-row">
+      <span><i class="fas fa-external-link-alt" aria-hidden="true"></i>DOI: 10.1016/j.ceja.2026.101132</span>
+      <span><i class="fas fa-lock-open" aria-hidden="true"></i>Open Access</span>
+    </div>
+    <div class="pub-highlights">
+      <div class="pub-hl">Novel TEA-arginine green solvent for enhanced CO₂ capture</div>
+      <div class="pub-hl">Threefold enhancement over MDEA benchmark (306 vs. 107 kmol/h·m³)</div>
+      <div class="pub-hl">Gas flow rate as dominant parameter — 61.7% contribution</div>
+      <div class="pub-hl">Random Forest model accuracy R² > 0.988</div>
+    </div>
+    <div class="pub-abstract">This study introduces a hybrid solvent combining TEA with bio-derived l-arginine within a microfluidic contactor. The TEA-Arg system achieved 306 kmol/h·m³ volumetric molar flux (73% capture efficiency) — a threefold enhancement over MDEA. Random Forest models accurately predicted key mass transfer parameters (R² > 0.988), enabling optimized CO₂ capture process design.</div>
+    <a href="https://www.sciencedirect.com/science/article/pii/S2666821126001018" target="_blank" rel="noopener" class="pub-link" aria-label="Read publication on ScienceDirect"><i class="fas fa-external-link-alt" aria-hidden="true"></i>Read on ScienceDirect</a>
+  </section>
+
   <footer>// <span>Amir Mehdi Parviz</span> · AI Developer · 2026</footer>
+</main>
+
+<div class="buddy" id="buddy" style="top:120px" aria-label="AI Buddy chat" role="button" tabindex="0">
+  <div class="buddy-inner">
+    <canvas id="deanCanvas" width="70" height="70" style="width:70px;height:70px;" aria-hidden="true"></canvas>
+    <div class="buddy-label">AI Buddy</div>
+    <div class="buddy-hint">click to chat</div>
+  </div>
 </div>
 
-<div class="buddy" id="buddy" style="top:120px"><div class="buddy-inner"><canvas id="deanCanvas" width="70" height="70" style="width:70px;height:70px;"></canvas><div class="buddy-label">AI Buddy</div><div class="buddy-hint">click to chat</div></div></div>
+<div class="overlay" id="mediaOverlay" role="dialog" aria-modal="true" aria-label="Media preview">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Project Preview</h3>
+      <button class="modal-close" id="closeMedia" aria-label="Close preview">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="overlay" id="chatOverlay" role="dialog" aria-modal="true" aria-label="AI Chat">
+  <div class="chat-box">
+    <div class="chat-head">
+      <div class="chat-status">AI Assistant · Groq (Llama 3)</div>
+      <button class="modal-close" id="closeChat" aria-label="Close chat">&times;</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg ai-msg">Hi! I'm Amir Mehdi Parviz's AI assistant. Ask me about skills, projects, or publications!</div>
+    </div>
+    <div class="chat-input">
+      <label for="chatInput" class="sr-only">Type your message</label>
+      <input type="text" id="chatInput" placeholder="ask anything..." autocomplete="off">
+      <button class="chat-send" id="chatSend">Send</button>
+    </div>
+  </div>
+</div>
 
-<div class="overlay" id="mediaOverlay"><div class="modal-box"><div class="modal-head"><h3 id="modalTitle">Project Preview</h3><button class="modal-close" id="closeMedia">&times;</button></div><div class="modal-body" id="modalBody"></div></div></div>
-<div class="overlay" id="chatOverlay"><div class="chat-box"><div class="chat-head"><div class="chat-status">AI Assistant · Groq (Llama 3)</div><button class="modal-close" id="closeChat">&times;</button></div><div class="chat-msgs" id="chatMsgs"><div class="msg ai-msg">Hi! I'm Amir Mehdi Parviz's AI assistant. Ask me about skills, projects, or publications!</div></div><div class="chat-input"><input type="text" id="chatInput" placeholder="ask anything..."><button class="chat-send" id="chatSend">Send</button></div></div></div>
+<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
 
 <script>
-// ========================
-// ستاره‌های زنده با چشمک زدن - تعداد کمتر
-// ========================
 (function(){
-  const canvas = document.getElementById('particleCanvas');
-  const ctx = canvas.getContext('2d');
-  let W, H;
-  
-  let stars = [];
-  let meteors = [];
-  
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    initStars();
-  }
-  
-  function initStars() {
-    stars = [];
-    // کاهش تعداد ستاره‌ها: تقسیم بر 5500 به جای 2000 قبلی
-    const starCount = Math.floor((W * H) / 5500);
-    for (let i = 0; i < starCount; i++) {
-      stars.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        radius: Math.random() * 2.0 + 0.6,
-        baseAlpha: 0.4 + Math.random() * 0.6,
-        twinkleSpeed: 0.8 + Math.random() * 2.5,
-        phase: Math.random() * Math.PI * 2
-      });
-    }
-  }
-  
-  function createMeteor() {
-    const startCorner = Math.floor(Math.random() * 4);
-    let startX, startY, targetX, targetY;
-    switch(startCorner) {
-      case 0: startX = 0; startY = 0; targetX = W; targetY = H; break;
-      case 1: startX = W; startY = 0; targetX = 0; targetY = H; break;
-      case 2: startX = 0; startY = H; targetX = W; targetY = 0; break;
-      default: startX = W; startY = H; targetX = 0; targetY = 0; break;
-    }
-    const durationFrames = 70;
-    const vx = (targetX - startX) / durationFrames;
-    const vy = (targetY - startY) / durationFrames;
-    
-    meteors.push({
-      x: startX, y: startY,
-      vx: vx, vy: vy,
-      trail: [],
-      createdAt: performance.now()
-    });
-  }
-  
-  setInterval(() => {
-    if (meteors.length < 3) createMeteor();
-  }, Math.random() * 8000 + 12000);
-  
-  setTimeout(() => createMeteor(), 2000);
-  
-  function updateMeteors(now) {
-    for (let i = 0; i < meteors.length; i++) {
-      const m = meteors[i];
-      m.x += m.vx;
-      m.y += m.vy;
-      m.trail.push({ x: m.x, y: m.y, time: now });
-      while (m.trail.length > 0 && (now - m.trail[0].time) > 2000) {
-        m.trail.shift();
-      }
-      if (m.x < -200 || m.x > W + 200 || m.y < -200 || m.y > H + 200) {
-        meteors.splice(i, 1);
-        i--;
-      }
-    }
-  }
-  
-  function drawStarsAndMeteors(now) {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, W, H);
-    
-    const timeSec = performance.now() / 1000;
-    // ستاره‌ها با چشمک زدن قوی
-    for (let s of stars) {
-      const twinkle = 0.5 + 0.5 * Math.sin(timeSec * s.twinkleSpeed + s.phase);
-      const alpha = s.baseAlpha * (0.4 + twinkle * 0.6);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 240, 210, ${alpha})`;
-      ctx.fill();
-      if (s.radius > 1.5) {
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = "rgba(255,220,150,0.6)";
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-    
-    // شهاب سنگ‌ها (بدون تغییر)
-    for (let m of meteors) {
-      if (m.trail.length < 2) continue;
-      for (let i = 0; i < m.trail.length - 1; i++) {
-        const p1 = m.trail[i];
-        const p2 = m.trail[i+1];
-        const age = now - p1.time;
-        let alpha = 0.7 * (1 - age / 2000);
-        if (alpha <= 0) continue;
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineWidth = 2.2;
-        ctx.strokeStyle = `rgba(255, 180, 80, ${alpha})`;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = `rgba(255, 230, 150, ${alpha * 0.8})`;
-        ctx.stroke();
-      }
-    }
-    
-    for (let m of meteors) {
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 200, 100, 0.9)`;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 1.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 200, 1)`;
-      ctx.fill();
-    }
-    
-    requestAnimationFrame(drawStarsAndMeteors);
-  }
-  
-  function mainLoop(time) {
-    updateMeteors(time);
-    drawStarsAndMeteors(time);
-    requestAnimationFrame(mainLoop);
-  }
-  
-  window.addEventListener('resize', () => {
-    resize();
-    meteors = [];
-    createMeteor();
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll progress
+  var scrollBar = document.getElementById('scrollProgress');
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    scrollBar.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
+  }, { passive: true });
+
+  // Sticky nav
+  var nav = document.getElementById('mainNav');
+  var lastScroll = 0;
+  window.addEventListener('scroll', function(){
+    var st = window.scrollY;
+    if (st > 300) { nav.classList.add('visible'); }
+    else { nav.classList.remove('visible'); }
+    lastScroll = st;
+  }, { passive: true });
+
+  // Hamburger
+  var hamburger = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', function(){
+    var open = navLinks.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
   });
-  resize();
-  requestAnimationFrame(mainLoop);
-})();
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
 
-// ========================
-// کهکشان راه شیری (سمت چپ) - بدون تغییر
-// ========================
-(function(){
-  const canvas = document.getElementById('milkywayCanvas');
-  const ctx = canvas.getContext('2d');
-  let width, height;
-  let lines = [];
-  const LINE_COUNT = 24;
-  const POINTS_PER_LINE = 70;
-  let scrollY = 0;
-  
-  function resizeCanvas() {
-    width = window.innerWidth < 768 ? 180 : 280;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-    initLines();
-  }
-  
-  function initLines() {
-    lines = [];
-    for (let i = 0; i < LINE_COUNT; i++) {
-      const points = [];
-      let startX = 10 + Math.random() * (width - 20);
-      for (let p = 0; p < POINTS_PER_LINE; p++) {
-        let t = p / POINTS_PER_LINE;
-        let xOff = Math.sin(t * Math.PI * 3.7 + i) * (Math.random() * 12 + 5);
-        let x = startX + xOff + (Math.sin(i) * 8);
-        x = Math.min(width - 12, Math.max(12, x));
-        points.push({ x: x, y: t * height, origX: x });
+  // Active nav link on scroll
+  var sections = document.querySelectorAll('section[id]');
+  var navAnchors = navLinks.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var scrollPos = window.scrollY + 100;
+    sections.forEach(function(sec){
+      if (sec.offsetTop <= scrollPos && sec.offsetTop + sec.offsetHeight > scrollPos) {
+        navAnchors.forEach(function(a){ a.classList.remove('active'); });
+        var active = navLinks.querySelector('a[href="#' + sec.id + '"]');
+        if (active) active.classList.add('active');
       }
-      lines.push({
-        points: points,
-        speed: 0.3 + Math.random() * 0.4,
-        phase: Math.random() * Math.PI * 2,
-        wiggle: 2 + Math.random() * 6,
-        color: `hsla(${160 + Math.random() * 30}, 70%, 65%, ${0.2 + Math.random() * 0.25})`
-      });
-    }
-    for (let i = 0; i < 12; i++) {
-      const points = [];
-      let startX = 5 + Math.random() * (width - 10);
-      for (let p = 0; p < 50; p++) {
-        let t = p / 50;
-        let xOff = Math.cos(t * Math.PI * 5.2 + i) * (Math.random() * 18);
-        let x = startX + xOff;
-        x = Math.min(width - 8, Math.max(8, x));
-        points.push({ x: x, y: t * height, origX: x });
+    });
+  }, { passive: true });
+
+  // Scroll reveal
+  var reveals = document.querySelectorAll('.reveal');
+  var revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
       }
-      lines.push({
-        points: points,
-        speed: 0.5 + Math.random() * 0.5,
-        phase: Math.random() * Math.PI,
-        wiggle: 3 + Math.random() * 7,
-        color: `hsla(${190 + Math.random() * 30}, 65%, 60%, 0.2)`
-      });
-    }
-  }
-  
-  function drawMilkyWay(now) {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "rgba(4, 5, 10, 0.08)";
-    ctx.fillRect(0, 0, width, height);
-    
-    for (let ln of lines) {
-      ctx.beginPath();
-      ctx.lineWidth = 1.2;
-      ctx.strokeStyle = ln.color;
-      ctx.shadowBlur = 3;
-      ctx.shadowColor = "rgba(110,255,200,0.4)";
-      
-      let offsetY = (scrollY * ln.speed) % (height * 1.2);
-      for (let repeat = -1; repeat <= 1; repeat++) {
-        let baseY = offsetY + repeat * height;
-        let first = true;
-        for (let i = 0; i < ln.points.length; i++) {
-          let p = ln.points[i];
-          let wigX = Math.sin(now * 0.0025 + p.y * 0.02 + ln.phase) * ln.wiggle;
-          let drawX = p.x + wigX;
-          let drawY = p.y + baseY;
-          if (drawY > -50 && drawY < height + 50) {
-            if (first) { ctx.moveTo(drawX, drawY); first = false; }
-            else { ctx.lineTo(drawX, drawY); }
-          } else { first = true; ctx.stroke(); ctx.beginPath(); first = true; }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(function(el){ revealObserver.observe(el); });
+
+  // Stars canvas - no shadowBlur for performance
+  if (!prefersReduced) {
+    (function(){
+      var canvas = document.getElementById('particleCanvas');
+      var ctx = canvas.getContext('2d');
+      var W, H, stars = [], meteors = [];
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        var isMobile = W < 768;
+        var divisor = isMobile ? 12000 : 5500;
+        var count = Math.floor((W * H) / divisor);
+        for (var i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * W, y: Math.random() * H,
+            r: Math.random() * 1.8 + 0.5,
+            ba: 0.4 + Math.random() * 0.6,
+            sp: 0.8 + Math.random() * 2.5,
+            ph: Math.random() * Math.PI * 2
+          });
         }
-        ctx.stroke();
-        ctx.beginPath();
+      }
+
+      function createMeteor() {
+        var c = Math.floor(Math.random() * 4);
+        var sx, sy, tx, ty;
+        if (c === 0) { sx = 0; sy = 0; tx = W; ty = H; }
+        else if (c === 1) { sx = W; sy = 0; tx = 0; ty = H; }
+        else if (c === 2) { sx = 0; sy = H; tx = W; ty = 0; }
+        else { sx = W; sy = H; tx = 0; ty = 0; }
+        var dur = 70;
+        meteors.push({ x: sx, y: sy, vx: (tx - sx) / dur, vy: (ty - sy) / dur, trail: [], born: performance.now() });
+      }
+
+      setInterval(function(){ if (meteors.length < 2) createMeteor(); }, 15000);
+      setTimeout(createMeteor, 2000);
+
+      var lastFrame = 0;
+      function loop(now) {
+        if (now - lastFrame < 33) { requestAnimationFrame(loop); return; }
+        lastFrame = now;
+        ctx.clearRect(0, 0, W, H);
+        var t = now / 1000;
+        var i, s, m, tw, a, idx;
+
+        for (i = 0; i < stars.length; i++) {
+          s = stars[i];
+          tw = 0.5 + 0.5 * Math.sin(t * s.sp + s.ph);
+          a = s.ba * (0.4 + tw * 0.6);
+          ctx.globalAlpha = a;
+          ctx.fillStyle = '#d0d0d0';
+          ctx.fillRect(s.x - s.r * 0.5, s.y - s.r * 0.5, s.r, s.r);
+        }
+        ctx.globalAlpha = 1;
+
+        for (i = meteors.length - 1; i >= 0; i--) {
+          m = meteors[i];
+          m.x += m.vx; m.y += m.vy;
+          m.trail.push({ x: m.x, y: m.y, t: now });
+          while (m.trail.length > 0 && (now - m.trail[0].t) > 2000) m.trail.shift();
+          if (m.x < -200 || m.x > W + 200 || m.y < -200 || m.y > H + 200) { meteors.splice(i, 1); continue; }
+          for (idx = 0; idx < m.trail.length - 1; idx++) {
+            var p1 = m.trail[idx], p2 = m.trail[idx + 1];
+            var age = now - p1.t;
+            a = 0.7 * (1 - age / 2000);
+            if (a <= 0) continue;
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+            ctx.lineWidth = 2;             ctx.strokeStyle = 'rgba(140,140,140,' + a + ')'; ctx.stroke();
+          }
+          ctx.beginPath(); ctx.arc(m.x, m.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(180,180,180,0.9)'; ctx.fill();
+        }
+        requestAnimationFrame(loop);
+      }
+      window.addEventListener('resize', function(){ resize(); meteors = []; createMeteor(); });
+      resize();
+      requestAnimationFrame(loop);
+    })();
+
+    // Milky way - simplified, no shadowBlur
+    (function(){
+      var canvas = document.getElementById('milkywayCanvas');
+      var ctx = canvas.getContext('2d');
+      var w, h, lines = [], scrollY = 0;
+
+      function resizeCanvas() {
+        w = window.innerWidth < 768 ? (window.innerWidth < 480 ? 0 : 140) : 240;
+        h = window.innerHeight;
+        if (w === 0) { canvas.style.display = 'none'; return; }
+        canvas.width = w; canvas.height = h;
+        initLines();
+      }
+
+      function initLines() {
+        lines = [];
+        var i, j, pts, sx, t, xo;
+        for (i = 0; i < 14; i++) {
+          pts = []; sx = 10 + Math.random() * (w - 20);
+          for (j = 0; j < 50; j++) {
+            t = j / 50; xo = Math.sin(t * Math.PI * 3.7 + i) * (Math.random() * 10 + 4);
+            pts.push({ x: Math.min(w - 12, Math.max(12, sx + xo + Math.sin(i) * 6)), y: t * h });
+          }
+          lines.push({ pts: pts, sp: 0.3 + Math.random() * 0.3, ph: Math.random() * Math.PI * 2, wg: 2 + Math.random() * 5, col: 'hsla(35,90%,60%,' + (0.3 + Math.random() * 0.35) + ')' });
+        }
+        for (i = 0; i < 10; i++) {
+          pts = []; sx = 5 + Math.random() * (w - 10);
+          for (j = 0; j < 50; j++) {
+            t = j / 50; xo = Math.cos(t * Math.PI * 5.2 + i) * (Math.random() * 14);
+            pts.push({ x: Math.min(w - 8, Math.max(8, sx + xo)), y: t * h });
+          }
+          lines.push({ pts: pts, sp: 0.4 + Math.random() * 0.4, ph: Math.random() * Math.PI, wg: 3 + Math.random() * 6, col: 'hsla(0,0%,95%,' + (0.2 + Math.random() * 0.25) + ')' });
+        }
+      }
+
+      var lastMW = 0;
+      function draw(now) {
+        if (now - lastMW < 50) { requestAnimationFrame(draw); return; }
+        lastMW = now;
+        if (w === 0) return;
+        ctx.clearRect(0, 0, w, h);
+        var i, j, ln, p, wig, dy;
+        for (i = 0; i < lines.length; i++) {
+          ln = lines[i];
+          ctx.beginPath(); ctx.lineWidth = 1; ctx.strokeStyle = ln.col;
+          var offY = (scrollY * ln.sp) % (h * 1.2);
+          for (var rep = -1; rep <= 1; rep++) {
+            var baseY = offY + rep * h;
+            var first = true;
+            for (j = 0; j < ln.pts.length; j++) {
+              p = ln.pts[j];
+              wig = Math.sin(now * 0.002 + p.y * 0.02 + ln.ph) * ln.wg;
+              dy = p.y + baseY;
+              if (dy > -50 && dy < h + 50) {
+                if (first) { ctx.moveTo(p.x + wig, dy); first = false; }
+                else ctx.lineTo(p.x + wig, dy);
+              } else { first = true; ctx.stroke(); ctx.beginPath(); }
+            }
+            ctx.stroke(); ctx.beginPath();
+          }
+        }
+        scrollY += 0.4;
+        if (scrollY > h * 1.5) scrollY %= h;
+        requestAnimationFrame(draw);
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      requestAnimationFrame(draw);
+    })();
+  }
+
+  // Mascot
+  (function(){
+    var c = document.getElementById('deanCanvas');
+    var ctx = c.getContext('2d'); c.width = 70; c.height = 70;
+    var waveRight = false, danceMode = false, legState = 0, armLeftUp = false, armRightUp = false;
+    setInterval(function(){ if (!danceMode) { waveRight = !waveRight; draw(); } }, 600);
+    function startDance() {
+      if (danceMode) return; danceMode = true; var step = 0;
+      var di = setInterval(function(){
+        if (!danceMode) { clearInterval(di); return; }
+        step++; legState = (legState + 1) % 3; armLeftUp = (step % 2 === 0); armRightUp = (step % 2 === 1); draw();
+      }, 150);
+      setTimeout(function(){ danceMode = false; clearInterval(di); legState = 0; armLeftUp = false; armRightUp = false; waveRight = false; draw(); }, 700);
+    }
+    setInterval(startDance, 4000);
+    setInterval(function(){ if (!danceMode) { legState = legState === 0 ? 1 : 0; draw(); setTimeout(function(){ if (!danceMode) { legState = 0; draw(); } }, 200); } }, 2200);
+    function draw() {
+      ctx.clearRect(0, 0, 70, 70);
+      ctx.fillStyle = '#E0B07F'; ctx.fillRect(28, 7, 14, 7);
+      ctx.fillStyle = '#F4C28C'; ctx.fillRect(30, 5, 10, 3);
+      ctx.fillStyle = '#FFDFB3'; ctx.fillRect(26, 12, 18, 14);
+      ctx.fillStyle = '#2F2E2E'; ctx.fillRect(30, 16, 3, 3); ctx.fillRect(37, 16, 3, 3);
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(31, 17, 1, 1); ctx.fillRect(38, 17, 1, 1);
+      ctx.fillStyle = '#5C3E1F'; ctx.fillRect(29, 14, 5, 2); ctx.fillRect(36, 14, 5, 2);
+      ctx.fillStyle = '#B87333'; ctx.fillRect(32, 23, 6, 2);
+      ctx.fillStyle = '#0d1e2e'; ctx.fillRect(23, 28, 24, 18);
+      ctx.fillStyle = '#142638'; ctx.fillRect(25, 30, 20, 3);
+      ctx.fillStyle = '#8B5A2B'; ctx.fillRect(32, 26, 6, 3);
+      ctx.fillStyle = '#A0522D'; ctx.fillRect(23, 42, 24, 3);
+      ctx.fillStyle = '#4af0b4'; ctx.fillRect(33, 42, 4, 3);
+      ctx.fillStyle = '#0d1e2e';
+      if (legState === 0) { ctx.fillRect(25, 46, 8, 16); ctx.fillRect(37, 46, 8, 16); }
+      else if (legState === 1) { ctx.fillRect(23, 46, 8, 16); ctx.fillRect(37, 46, 10, 16); }
+      else { ctx.fillRect(25, 46, 10, 16); ctx.fillRect(39, 46, 8, 16); }
+      ctx.fillStyle = '#060f1a';
+      if (legState === 0) { ctx.fillRect(22, 60, 12, 5); ctx.fillRect(36, 60, 12, 5); }
+      else if (legState === 1) { ctx.fillRect(20, 60, 12, 5); ctx.fillRect(36, 60, 12, 5); }
+      else { ctx.fillRect(22, 60, 12, 5); ctx.fillRect(38, 60, 12, 5); }
+      var lUp = (danceMode && armLeftUp), rUp = (danceMode && armRightUp) || (!danceMode && waveRight);
+      ctx.fillStyle = '#0d1e2e';
+      if (lUp) { ctx.fillRect(18, 26, 5, 9); ctx.fillStyle = '#FFDFB3'; ctx.fillRect(18, 24, 4, 4); }
+      else { ctx.fillRect(20, 32, 5, 10); ctx.fillStyle = '#FFDFB3'; ctx.fillRect(20, 42, 4, 4); }
+      if (rUp) { ctx.fillStyle = '#0d1e2e'; ctx.fillRect(47, 26, 5, 9); ctx.fillStyle = '#FFDFB3'; ctx.fillRect(48, 24, 4, 4); }
+      else { ctx.fillStyle = '#0d1e2e'; ctx.fillRect(45, 32, 5, 10); ctx.fillStyle = '#FFDFB3'; ctx.fillRect(46, 42, 4, 4); }
+      ctx.fillStyle = '#4af0b4'; ctx.fillRect(32, 35, 6, 3);
+    }
+    draw();
+  })();
+
+  // Buddy position
+  (function(){
+    var buddy = document.getElementById('buddy');
+    var repos = document.getElementById('repos-section');
+    var pTitle = document.getElementById('projects-title');
+    var H0 = 120, target = H0, current = H0, af = null;
+    function update() {
+      var wh = window.innerHeight;
+      var rr = repos.getBoundingClientRect(), pr = pTitle.getBoundingClientRect();
+      target = H0;
+      if (rr.top < wh - 100 && rr.bottom > 100) target = Math.min(wh - 80, Math.max(20, rr.top + rr.height / 2 - 35));
+      else if (pr.top < wh - 100 && pr.bottom > 100) target = Math.min(wh - 80, Math.max(20, pr.top + pr.height / 2 - 35));
+      if (!af) {
+        function sm() {
+          var d = target - current;
+          if (Math.abs(d) < 0.5) { current = target; buddy.style.top = current + 'px'; af = null; }
+          else { current += d * 0.15; buddy.style.top = current + 'px'; af = requestAnimationFrame(sm); }
+        }
+        sm();
       }
     }
-    
-    ctx.shadowBlur = 0;
-    for (let s = 0; s < 180; s++) {
-      let starY = (scrollY * 0.8 + s * 17) % (height + 30) - 15;
-      let starX = (Math.sin(s * 0.7) * 12 + Math.cos(scrollY * 0.02 + s) * 5) + width/2 + 5;
-      if (starX > 5 && starX < width-5 && starY > 0 && starY < height) {
-        ctx.fillStyle = `rgba(255, 240, 200, ${0.3 + Math.sin(scrollY*0.02 + s)*0.1})`;
-        ctx.beginPath();
-        ctx.arc(starX, starY, 0.8 + Math.sin(scrollY*0.05 + s)*0.3, 0, Math.PI*2);
-        ctx.fill();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // Projects
+  (function(){
+    var projects = [
+      { title: "Parviz Mind IDE", path: "./exmaple_ide.png", type: "image" },
+      { title: "Speed & Distance Estimator", path: "./Speed-and-Distance-Estimator.mp4", type: "video" },
+      { title: "Traffic Control System", path: "./traffic.mp4", type: "video" }
+    ];
+    var grid = document.getElementById('projGrid');
+    projects.forEach(function(p){
+      var card = document.createElement('div');
+      card.className = 'proj-card';
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', 'View ' + p.title);
+      var thumb = document.createElement('div');
+      thumb.className = 'proj-thumb';
+      if (p.type === 'image') {
+        var img = document.createElement('img');
+        img.src = p.path; img.alt = p.title + ' preview'; img.loading = 'lazy';
+        img.onerror = function(){ thumb.innerHTML = '<span style="color:var(--text-dim);font-family:var(--mono);font-size:0.8rem">no preview</span>'; };
+        thumb.appendChild(img);
+      } else {
+        var v = document.createElement('video');
+        v.muted = true; v.preload = 'metadata'; v.playsInline = true;
+        var s = document.createElement('source');
+        s.src = p.path; s.type = 'video/mp4';
+        v.appendChild(s);
+        v.onerror = function(){ thumb.innerHTML = '<span style="color:var(--text-dim);font-family:var(--mono);font-size:0.8rem">no preview</span>'; };
+        thumb.appendChild(v);
       }
+      card.appendChild(thumb);
+      var lbl = document.createElement('div');
+      lbl.className = 'proj-label';
+      lbl.innerHTML = '<i class="fas fa-play-circle" aria-hidden="true"></i>' + p.title;
+      card.appendChild(lbl);
+      function open() { openMedia(p.title, p.path, p.type); }
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+      grid.appendChild(card);
+    });
+  })();
+
+  function openMedia(title, src, type) {
+    document.getElementById('modalTitle').innerText = title;
+    var body = document.getElementById('modalBody'); body.innerHTML = '';
+    if (type === 'image') {
+      var img = document.createElement('img');
+      img.src = src; img.alt = title;
+      img.onerror = function(){ body.innerHTML = '<p style="color:var(--text-muted)">File not found</p>'; };
+      body.appendChild(img);
+    } else {
+      var v = document.createElement('video'); v.controls = true; v.playsInline = true;
+      var s = document.createElement('source'); s.src = src; s.type = 'video/mp4';
+      v.appendChild(s);
+      body.appendChild(v);
     }
-    
-    scrollY += 0.6;
-    if (scrollY > height * 1.5) scrollY = scrollY % height;
-    requestAnimationFrame(drawMilkyWay);
+    document.getElementById('mediaOverlay').classList.add('show');
+    document.getElementById('closeMedia').focus();
   }
-  
-  window.addEventListener('resize', () => resizeCanvas());
-  resizeCanvas();
-  requestAnimationFrame((t) => drawMilkyWay(t));
-})();
+  document.getElementById('closeMedia').onclick = function(){ document.getElementById('mediaOverlay').classList.remove('show'); };
+  document.getElementById('mediaOverlay').addEventListener('click', function(e){ if (e.target === this) this.classList.remove('show'); });
 
-// ========================
-// Mascot , Projects , Chat (بدون تغییر)
-// ========================
-(function(){
-  const c = document.getElementById('deanCanvas'); const ctx = c.getContext('2d'); c.width = 70; c.height = 70;
-  let waveRight=false, danceMode=false, legState=0, armLeftUp=false, armRightUp=false;
-  setInterval(()=>{ if(!danceMode){ waveRight=!waveRight; draw(); } }, 600);
-  function startDance(){ if(danceMode) return; danceMode=true; let step=0; const di=setInterval(()=>{ if(!danceMode){clearInterval(di);return;} step++; legState=(legState+1)%3; armLeftUp=(step%2===0); armRightUp=(step%2===1); draw(); },150); setTimeout(()=>{ danceMode=false; clearInterval(di); legState=0; armLeftUp=false; armRightUp=false; waveRight=false; draw(); },700); }
-  setInterval(startDance, 4000);
-  setInterval(()=>{ if(!danceMode){ legState=legState===0?1:0; draw(); setTimeout(()=>{ if(!danceMode){legState=0;draw();} },200); } },2200);
-  function draw(){
-    ctx.clearRect(0,0,70,70); ctx.fillStyle='#E0B07F'; ctx.fillRect(28,7,14,7); ctx.fillStyle='#F4C28C'; ctx.fillRect(30,5,10,3); ctx.fillStyle='#FFDFB3'; ctx.fillRect(26,12,18,14); ctx.fillStyle='#2F2E2E'; ctx.fillRect(30,16,3,3); ctx.fillRect(37,16,3,3); ctx.fillStyle='#FFFFFF'; ctx.fillRect(31,17,1,1); ctx.fillRect(38,17,1,1); ctx.fillStyle='#5C3E1F'; ctx.fillRect(29,14,5,2); ctx.fillRect(36,14,5,2); ctx.fillStyle='#B87333'; ctx.fillRect(32,23,6,2); ctx.fillStyle='#0d1e2e'; ctx.fillRect(23,28,24,18); ctx.fillStyle='#142638'; ctx.fillRect(25,30,20,3); ctx.fillStyle='#8B5A2B'; ctx.fillRect(32,26,6,3); ctx.fillStyle='#A0522D'; ctx.fillRect(23,42,24,3); ctx.fillStyle='#4af0b4'; ctx.fillRect(33,42,4,3); ctx.fillStyle='#0d1e2e'; if(legState===0){ctx.fillRect(25,46,8,16);ctx.fillRect(37,46,8,16);} else if(legState===1){ctx.fillRect(23,46,8,16);ctx.fillRect(37,46,10,16);} else{ctx.fillRect(25,46,10,16);ctx.fillRect(39,46,8,16);} ctx.fillStyle='#060f1a'; if(legState===0){ctx.fillRect(22,60,12,5);ctx.fillRect(36,60,12,5);} else if(legState===1){ctx.fillRect(20,60,12,5);ctx.fillRect(36,60,12,5);} else{ctx.fillRect(22,60,12,5);ctx.fillRect(38,60,12,5);} let lUp=(danceMode&&armLeftUp), rUp=(danceMode&&armRightUp)||(!danceMode&&waveRight); ctx.fillStyle='#0d1e2e'; if(lUp){ctx.fillRect(18,26,5,9);ctx.fillStyle='#FFDFB3';ctx.fillRect(18,24,4,4);} else{ctx.fillRect(20,32,5,10);ctx.fillStyle='#FFDFB3';ctx.fillRect(20,42,4,4);} if(rUp){ctx.fillStyle='#0d1e2e';ctx.fillRect(47,26,5,9);ctx.fillStyle='#FFDFB3';ctx.fillRect(48,24,4,4);} else{ctx.fillStyle='#0d1e2e';ctx.fillRect(45,32,5,10);ctx.fillStyle='#FFDFB3';ctx.fillRect(46,42,4,4);} ctx.fillStyle='#4af0b4'; ctx.fillRect(32,35,6,3);
+  // Chat
+  var USE_PROXY = true;
+  var PROXY_URL = "https://your-worker-name.workers.dev";
+  async function callGroq(messages) {
+    if (USE_PROXY) {
+      var res = await fetch(PROXY_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: messages }) });
+      if (!res.ok) throw new Error("Proxy error");
+      var data = await res.json();
+      return data.choices[0].message.content;
+    } else {
+      var GROQ_API_KEY = "gsk_...";
+      var GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+      var res = await fetch(GROQ_ENDPOINT, { method: "POST", headers: { "Authorization": "Bearer " + GROQ_API_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama3-70b-8192", messages: messages, temperature: 0.7 }) });
+      if (!res.ok) throw new Error(await res.text());
+      var data = await res.json();
+      return data.choices[0].message.content;
+    }
   }
-  draw();
-})();
-
-(function(){
-  const buddy = document.getElementById('buddy'); const repos = document.getElementById('repos-section'); const pTitle = document.getElementById('projects-title'); const H0 = 120; let target=H0, current=H0, af=null;
-  function update(){ const wh=window.innerHeight; const rr=repos.getBoundingClientRect(), pr=pTitle.getBoundingClientRect(); let nt=H0; if(rr.top<wh-100&&rr.bottom>100) nt=Math.min(wh-80,Math.max(20,rr.top+rr.height/2-35)); else if(pr.top<wh-100&&pr.bottom>100) nt=Math.min(wh-80,Math.max(20,pr.top+pr.height/2-35)); target=nt; if(!af){ function sm(){ const d=target-current; if(Math.abs(d)<0.5){current=target;buddy.style.top=current+'px';af=null;} else{current+=d*0.15;buddy.style.top=current+'px';af=requestAnimationFrame(sm);} } sm(); } }
-  window.addEventListener('scroll',update); window.addEventListener('resize',update); update();
-})();
-
-(function(){
-  const projects = [ { title:"Parviz Mind IDE", path:"./exmaple_ide.png", type:"image" }, { title:"Speed & Distance Estimator", path:"./Speed-and-Distance-Estimator.mp4", type:"video" }, { title:"Traffic Control System", path:"./traffic.mp4", type:"video" } ];
-  const grid = document.getElementById('projGrid');
-  projects.forEach(p => { const card = document.createElement('div'); card.className='proj-card'; const thumb = document.createElement('div'); thumb.className='proj-thumb'; if(p.type==='image'){ const img=document.createElement('img'); img.src=p.path.replace(/\\/g,'/'); img.onerror=()=>{ thumb.innerHTML='<span class="no-media">no preview</span>'; }; thumb.appendChild(img); } else { const v=document.createElement('video'); v.muted=true; v.preload='metadata'; const s=document.createElement('source'); s.src=p.path.replace(/\\/g,'/'); s.type='video/mp4'; v.appendChild(s); v.onerror=()=>{ thumb.innerHTML='<span class="no-media">no preview</span>'; }; thumb.appendChild(v); } card.appendChild(thumb); const lbl=document.createElement('div'); lbl.className='proj-label'; lbl.innerHTML=`<i class="fas fa-play-circle"></i>${p.title}`; card.appendChild(lbl); card.addEventListener('click',()=>openMedia(p.title,p.path.replace(/\\/g,'/'),p.type)); grid.appendChild(card); });
-})();
-function openMedia(title, src, type){ document.getElementById('modalTitle').innerText=title; const body=document.getElementById('modalBody'); body.innerHTML=''; if(type==='image'){ const img=document.createElement('img'); img.src=src; img.onerror=()=>{ body.innerHTML='<p style="color:var(--text-muted);">File not found</p>'; }; body.appendChild(img); } else { const v=document.createElement('video'); v.controls=true; const s=document.createElement('source'); s.src=src; s.type='video/mp4'; v.appendChild(s); body.appendChild(v); } document.getElementById('mediaOverlay').classList.add('show'); }
-document.getElementById('closeMedia').onclick=()=>document.getElementById('mediaOverlay').classList.remove('show');
-document.getElementById('mediaOverlay').addEventListener('click',(e)=>{ if(e.target===document.getElementById('mediaOverlay')) document.getElementById('mediaOverlay').classList.remove('show'); });
-
-// Chat proxy (تنظیمات پروکسی)
-const USE_PROXY = true;
-const PROXY_URL = "https://your-worker-name.workers.dev"; 
-async function callGroq(messages) {
-  if (USE_PROXY) {
-    const res = await fetch(PROXY_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages }) });
-    if (!res.ok) throw new Error("Proxy error");
-    const data = await res.json();
-    return data.choices[0].message.content;
-  } else {
-    const GROQ_API_KEY = "gsk_..."; const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-    const res = await fetch(GROQ_ENDPOINT, { method: "POST", headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama3-70b-8192", messages: messages, temperature: 0.7 }) });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json(); return data.choices[0].message.content;
-  }
-}
-(function(){
-  const buddy = document.getElementById('buddy'); const overlay = document.getElementById('chatOverlay'); const msgs = document.getElementById('chatMsgs'); const input = document.getElementById('chatInput'); const send = document.getElementById('chatSend'); let waiting = false;
-  function addMsg(text, isUser){ const d=document.createElement('div'); d.className='msg '+(isUser?'user-msg':'ai-msg'); d.innerText=text; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
-  function showTyping(){ const t=document.createElement('div'); t.className='typing'; t.id='typing'; t.innerText='...thinking'; msgs.appendChild(t); msgs.scrollTop=msgs.scrollHeight; }
-  function removeTyping(){ const el=document.getElementById('typing'); if(el) el.remove(); }
-  const systemPrompt = "You are an AI assistant for Amir Mehdi Parviz, an AI developer and researcher. Answer questions about his skills (Python, Deep Learning, LLM, Computer Vision, EEG), experience (Caitech), projects, publication on CO₂ capture with machine learning, and education. Be concise and helpful.";
-  async function doSend(){ if(waiting) return; const msg=input.value.trim(); if(!msg) return; addMsg(msg,true); input.value=''; waiting=true; showTyping(); try { const reply = await callGroq([{ role: "system", content: systemPrompt }, { role: "user", content: msg }]); removeTyping(); addMsg(reply, false); } catch(e){ removeTyping(); addMsg("⚠️ Proxy connection error. Ensure Cloudflare Worker is set up.", false); } finally{ waiting=false; } }
-  buddy.addEventListener('click',()=>overlay.classList.add('show'));
-  document.getElementById('closeChat').onclick=()=>overlay.classList.remove('show');
-  overlay.addEventListener('click',(e)=>{ if(e.target===overlay) overlay.classList.remove('show'); });
-  send.addEventListener('click',doSend);
-  input.addEventListener('keypress',(e)=>{ if(e.key==='Enter') doSend(); });
+  (function(){
+    var buddy = document.getElementById('buddy');
+    var overlay = document.getElementById('chatOverlay');
+    var msgs = document.getElementById('chatMsgs');
+    var input = document.getElementById('chatInput');
+    var send = document.getElementById('chatSend');
+    var waiting = false;
+    function addMsg(text, isUser) {
+      var d = document.createElement('div');
+      d.className = 'msg ' + (isUser ? 'user-msg' : 'ai-msg');
+      d.innerText = text;
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    function showTyping() {
+      var t = document.createElement('div');
+      t.className = 'typing'; t.id = 'typing'; t.innerText = '...thinking';
+      msgs.appendChild(t);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    function removeTyping() { var el = document.getElementById('typing'); if (el) el.remove(); }
+    var systemPrompt = "You are an AI assistant for Amir Mehdi Parviz, an AI developer and researcher. Answer questions about his skills (Python, Deep Learning, LLM, Computer Vision, EEG), experience (Caitech), projects, publication on CO\u2082 capture with machine learning, and education. Be concise and helpful.";
+    async function doSend() {
+      if (waiting) return;
+      var msg = input.value.trim();
+      if (!msg) return;
+      addMsg(msg, true); input.value = ''; waiting = true; showTyping();
+      try {
+        var reply = await callGroq([{ role: "system", content: systemPrompt }, { role: "user", content: msg }]);
+        removeTyping(); addMsg(reply, false);
+      } catch(e) { removeTyping(); addMsg("\u26a0\ufe0f Proxy connection error. Ensure Cloudflare Worker is set up.", false); }
+      finally { waiting = false; }
+    }
+    buddy.addEventListener('click', function(){ overlay.classList.add('show'); input.focus(); });
+    buddy.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); overlay.classList.add('show'); input.focus(); } });
+    document.getElementById('closeChat').onclick = function(){ overlay.classList.remove('show'); buddy.focus(); };
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.classList.remove('show'); });
+    send.addEventListener('click', doSend);
+    input.addEventListener('keypress', function(e){ if (e.key === 'Enter') doSend(); });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') {
+        if (overlay.classList.contains('show')) { overlay.classList.remove('show'); buddy.focus(); }
+        if (document.getElementById('mediaOverlay').classList.contains('show')) document.getElementById('mediaOverlay').classList.remove('show');
+      }
+    });
+  })();
 })();
 </script>
 </body>
