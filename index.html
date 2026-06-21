@@ -132,12 +132,12 @@ nav.visible { transform: translateY(0); }
 #milkywayCanvas {
   position: fixed; top: 0; left: 0;
   width: 240px; height: 100%;
-  z-index: 2; pointer-events: none;
+  z-index: 0; pointer-events: none;
   opacity: 0.7; will-change: contents;
 }
 
 @media (max-width: 768px) {
-  #milkywayCanvas { width: 140px; opacity: 0.5; }
+  #milkywayCanvas { width: 100px; opacity: 0.25; }
 }
 @media (max-width: 480px) {
   #milkywayCanvas { display: none; }
@@ -171,6 +171,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .prompt-line .ps { color: var(--prompt); }
 .prompt-line .cmd { color: #d4d4d4; }
@@ -195,6 +196,7 @@ body::before {
   text-transform: uppercase;
   margin-bottom: 1rem;
   display: flex; align-items: center; gap: 0.6rem;
+  text-shadow: 0 0 6px var(--space-1), 0 0 10px var(--space-1);
 }
 .hero-tag::before { content: '//'; color: var(--text-dim); }
 .hero-name {
@@ -205,6 +207,7 @@ body::before {
   letter-spacing: -0.02em;
   line-height: 1.1;
   margin-bottom: 1rem;
+  text-shadow: 0 0 8px var(--space-1), 0 0 16px var(--space-1);
 }
 .hero-name .last {
   color: var(--accent);
@@ -216,6 +219,7 @@ body::before {
   color: var(--text-muted);
   margin-bottom: 1.8rem;
   line-height: 1.8;
+  text-shadow: 0 0 6px var(--space-1), 0 0 12px var(--space-1);
 }
 .hero-sub .kw, .hero-sub .str { color: var(--accent2); }
 .hero-sub .fn { color: var(--accent2); }
@@ -242,6 +246,7 @@ body::before {
   transition: all 0.2s ease;
   min-height: 44px;
   cursor: default;
+  text-shadow: 0 0 4px var(--space-1);
 }
 a.contact-item { cursor: pointer; }
 .contact-item i { color: var(--accent); font-size: 0.8rem; width: 1.2rem; text-align: center; }
@@ -262,6 +267,7 @@ a.contact-item { cursor: pointer; }
   margin-bottom: 1.2rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 6px var(--space-1), 0 0 10px var(--space-1);
 }
 
 .skills-wrap { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -276,6 +282,7 @@ a.contact-item { cursor: pointer; }
   padding: 0.4rem 0.75rem;
   transition: all 0.2s ease;
   cursor: default;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .sk i { color: var(--accent2); font-size: 0.8rem; width: 1.2rem; text-align: center; }
 .sk:hover { color: var(--accent); border-color: rgba(217, 119, 6, 0.4); background: rgba(217, 119, 6, 0.08); }
@@ -295,17 +302,20 @@ a.contact-item { cursor: pointer; }
   font-family: var(--mono);
   font-size: 1rem; font-weight: 600;
   color: var(--text-bright);
+  text-shadow: 0 0 6px var(--space-1), 0 0 10px var(--space-1);
 }
 .exp-co {
   font-family: var(--mono);
   font-size: 0.85rem;
   color: var(--accent);
   margin-bottom: 0.7rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .exp-date {
   font-family: var(--mono);
   font-size: 0.75rem;
   color: var(--text-dim);
+  text-shadow: 0 0 4px var(--space-1);
 }
 .exp-list { list-style: none; }
 .exp-list li {
@@ -314,6 +324,7 @@ a.contact-item { cursor: pointer; }
   color: var(--text-bright);
   line-height: 1.7;
   margin-bottom: 0.6rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .exp-list li::before {
   content: '›'; color: var(--accent);
@@ -328,8 +339,9 @@ a.contact-item { cursor: pointer; }
   font-family: var(--mono);
   font-size: 1rem; font-weight: 600;
   color: var(--text-bright);
+  text-shadow: 0 0 6px var(--space-1), 0 0 10px var(--space-1);
 }
-.edu-uni { font-size: 0.9rem; color: var(--text-bright); margin-top: 0.2rem; }
+.edu-uni { font-size: 0.9rem; color: var(--text-bright); margin-top: 0.2rem; text-shadow: 0 0 4px var(--space-1); }
 
 .repos-wrap { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .repo-btn {
@@ -344,6 +356,7 @@ a.contact-item { cursor: pointer; }
   text-decoration: none;
   transition: all 0.2s ease;
   min-height: 44px;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .repo-btn i { color: var(--accent2); font-size: 0.8rem; }
 .repo-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(217, 119, 6, 0.08); }
@@ -381,6 +394,7 @@ a.contact-item { cursor: pointer; }
   font-size: 0.8rem;
   color: var(--text-bright);
   display: flex; align-items: center; gap: 0.5rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .proj-label i { color: var(--accent); }
 
@@ -391,6 +405,7 @@ a.contact-item { cursor: pointer; }
   margin-bottom: 0.8rem;
   display: flex; align-items: center; gap: 0.5rem;
   flex-wrap: wrap;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .pub-title {
   font-size: clamp(1rem, 2.5vw, 1.15rem);
@@ -398,12 +413,14 @@ a.contact-item { cursor: pointer; }
   color: var(--text-bright);
   line-height: 1.45;
   margin-bottom: 0.5rem;
+  text-shadow: 0 0 6px var(--space-1), 0 0 10px var(--space-1);
 }
 .pub-authors {
   font-family: var(--mono);
   font-size: 0.8rem;
   color: var(--text-bright);
   margin-bottom: 0.8rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .pub-authors strong { color: var(--accent); }
 .pub-meta-row {
@@ -411,6 +428,7 @@ a.contact-item { cursor: pointer; }
   font-family: var(--mono); font-size: 0.7rem;
   color: var(--text-dim);
   margin-bottom: 1rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .pub-meta-row i { color: var(--accent2); }
 .pub-highlights {
@@ -429,6 +447,7 @@ a.contact-item { cursor: pointer; }
   border-radius: var(--radius-sm);
   padding: 0.6rem 0.8rem;
   align-items: flex-start;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .pub-hl::before {
   content: '✦'; color: var(--accent);
@@ -444,6 +463,7 @@ a.contact-item { cursor: pointer; }
   background: rgba(255, 255, 255, 0.04);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 1rem;
+  text-shadow: 0 0 4px var(--space-1);
 }
 .pub-link {
   display: inline-flex; align-items: center; gap: 0.6rem;
@@ -647,7 +667,7 @@ footer span { color: var(--accent); }
       <span class="contact-item" role="listitem"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Iran</span>
       <a href="https://www.linkedin.com/in/amir-mehdi-parviz/" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i>LinkedIn</a>
       <a href="https://github.com/GIGAParviz" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="GitHub profile"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>
-      <a href="https://huggingface.co/GIGAParviz" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="Hugging Face profile"><i class="fas fa-hugging-face" aria-hidden="true"></i>Hugging Face</a>
+      <a href="https://huggingface.co/GIGAParviz" target="_blank" rel="noopener" class="contact-item" role="listitem" aria-label="Hugging Face profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.2rem;height:1.2rem;color:var(--accent);display:inline-block;vertical-align:middle;flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M18 8s-1-1-2-1-2 1-2 1"/><path d="M6 8s1-1 2-1 2 1 2 1"/></svg>Hugging Face</a>
     </div>
   </section>
 
@@ -920,7 +940,7 @@ footer span { color: var(--accent); }
       var w, h, lines = [], scrollY = 0;
 
       function resizeCanvas() {
-        w = window.innerWidth < 768 ? (window.innerWidth < 480 ? 0 : 140) : 240;
+        w = window.innerWidth < 768 ? (window.innerWidth < 480 ? 0 : 100) : 240;
         h = window.innerHeight;
         if (w === 0) { canvas.style.display = 'none'; return; }
         canvas.width = w; canvas.height = h;
